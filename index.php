@@ -39,6 +39,7 @@ $editor_plugin_dir_url = plugin_dir_url( __FILE__ );
 
 add_action('init', 'init_functions');
 add_action('wp_print_scripts', 'pluginUrl_inline_script');
+add_action('wp_head', 'add__editor_popup');
 
 function add_styles_scripts(){
     wp_enqueue_style( 'editor', plugin_dir_url( __FILE__ ) . '/frontend-haskjd/public_html/css/editor.css' );
@@ -56,4 +57,11 @@ function pluginUrl_inline_script(){
     echo "<script type='text/javascript'>".PHP_EOL;
         echo 'var pluginUrl = "' . $editor_plugin_dir_url . '";'.PHP_EOL;
     echo "</script>";
+}
+
+function add__editor_popup() {
+    if(is_user_logged_in()){
+        echo '<div data-id="editor_popup" id="editor_popup"><textarea id="text_editor"></textarea><div id="text_editor__footer"><button id="editor__discard_changes">Discard changes</button><button id="editor__save">Save</button></div></div>';
+    }
+
 }
