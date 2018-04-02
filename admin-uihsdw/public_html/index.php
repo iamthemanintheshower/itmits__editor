@@ -36,6 +36,7 @@ if(!is_user_logged_in){
     return false;
 }
 
+//# Save
 if(isset($_POST['HTML_tag_identifier'])
     && isset($_POST['HTML_tag_string'])
     ){
@@ -46,9 +47,55 @@ if(isset($_POST['HTML_tag_identifier'])
     set_theme_mod( 'all_'.$HTML_tag_identifier, $HTML_tag_string ); //# TODO use the right section of drop out the section mechanism if it is unused
 }
 
-
 function _replaceDivbyBreakRow($HTML_tag_string){
     $HTML_tag_string = str_replace('<div>', '<br>', $HTML_tag_string);
     $HTML_tag_string = str_replace('</div>', '', $HTML_tag_string);
     return $HTML_tag_string;
+}
+
+
+//# Save editor
+if(isset($_POST['field_id'])
+    && isset($_POST['page_code'])
+    ){
+
+    $page_template = '';
+    
+    foreach ($fieldsByPage as $k => $v){
+        foreach ($v as $field_id){
+            if($field_id === $_POST['field_id']){
+                $page_template = get_template_directory().'/'.$k;
+            }
+        }
+    }
+    if($page_template !== ''){
+        $_file_put_contents = file_put_contents($page_template, str_replace('\"', '"', $_POST['page_code']));
+
+        echo response(array('page_template' => $page_template, 'file_put_contents' => $_file_put_contents));
+    }
+}
+
+//# Code editor
+if(isset($_POST['field_id'])
+    ){
+
+    foreach ($fieldsByPage as $k => $v){
+        foreach ($v as $field_id){
+            if($field_id === $_POST['field_id']){
+                $_file_get_contents = file_get_contents(get_template_directory().'/'.$k);
+
+                echo response(array('file_content' => $_file_get_contents));
+            }
+        }
+    }
+}
+
+
+//# FUNCTIONS
+function response($response){
+    header("Content-Type: application/json");
+    if($response !== ''){
+        echo json_encode($response);
+    }
+    die();
 }
